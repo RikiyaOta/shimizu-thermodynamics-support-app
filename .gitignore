@@ -10,6 +10,13 @@ dist/
 dist-ssr/
 *.local
 
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
 # Editor / OS
 .DS_Store
 *.suo
