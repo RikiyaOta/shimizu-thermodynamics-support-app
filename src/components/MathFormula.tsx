@@ -16,15 +16,13 @@ export const MathFormula: React.FC<MathFormulaProps> = ({ state }) => {
     }
   };
 
-  const rectArea = state.x * state.p;
-
   return (
-    <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60 shadow-xl space-y-5">
+    <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60 shadow-xl space-y-4">
       {/* Title & Domain Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-700/60">
         <span className="text-base font-bold text-sky-400 flex items-center gap-2">
           <Calculator className="w-5 h-5" />
-          数式と数値の対応・解説
+          数式と解説
         </span>
         <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-900 text-slate-300 border border-slate-700 shadow-inner self-start sm:self-auto">
           {state.domainName}
@@ -47,28 +45,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({ state }) => {
         </p>
       </div>
 
-      {/* Numerical Step-by-Step Breakdown */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <div className="bg-slate-900/70 p-3 rounded-xl border border-slate-700/40 shadow-sm space-y-1">
-          <span className="text-slate-400 block font-medium">長方形全体 (xp)</span>
-          <span className="font-mono text-slate-100 text-base font-bold block">{rectArea.toFixed(3)}</span>
-          <span className="text-[11px] text-slate-500 font-mono block">{state.x.toFixed(2)} × {state.p.toFixed(2)}</span>
-        </div>
-
-        <div className="bg-slate-900/70 p-3 rounded-xl border border-sky-500/30 shadow-sm space-y-1">
-          <span className="text-sky-400 block font-medium">積分領域 f(x) (下面積)</span>
-          <span className="font-mono text-sky-300 text-base font-bold block">{state.fx.toFixed(3)}</span>
-          <span className="text-[11px] text-slate-500 font-mono block">∫ f'(x') dx'</span>
-        </div>
-
-        <div className="bg-slate-900/70 p-3 rounded-xl border border-amber-500/30 shadow-sm space-y-1">
-          <span className="text-amber-400 block font-medium">差分領域 g(p) (上面積)</span>
-          <span className="font-mono text-amber-300 text-base font-bold block">{state.gp.toFixed(3)}</span>
-          <span className="text-[11px] text-slate-500 font-mono block">{rectArea.toFixed(3)} - {state.fx.toFixed(3)}</span>
-        </div>
-      </div>
-
-      {/* Dual Property Highlight Box with rendered KaTeX */}
+      {/* Dual Property Highlight Box */}
       <div className="bg-teal-500/10 border border-teal-500/30 p-3.5 rounded-xl text-xs space-y-2">
         <span className="font-bold text-teal-300 flex items-center gap-1.5 text-xs">
           <ArrowLeftRight className="w-4 h-4" />

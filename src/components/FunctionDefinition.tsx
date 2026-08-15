@@ -60,14 +60,9 @@ export const FunctionDefinition: React.FC<FunctionDefinitionProps> = ({ state })
 
               <div className="flex items-center gap-2 text-xs font-mono self-end sm:self-auto">
                 <span
-                  className={isActive ? 'text-amber-300 font-semibold' : 'text-slate-400'}
+                  className={isActive ? 'text-amber-300 font-bold' : 'text-slate-400'}
                   dangerouslySetInnerHTML={renderMath(`(${row.condition})`)}
                 />
-                {isActive && (
-                  <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded font-sans">
-                    選択中
-                  </span>
-                )}
               </div>
             </div>
           );
