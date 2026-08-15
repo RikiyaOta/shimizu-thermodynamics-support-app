@@ -16,7 +16,7 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
   visibility,
   onChangeVisibility,
   onChangeX,
-  heightClass = 'h-96',
+  heightClass = 'h-72',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -37,7 +37,7 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     const margin = { top: 30, right: 30, bottom: 40, left: 45 };
 
     const xMin = 0;
-    const xMax = 4.2;
+    const xMax = 4.5;
     const pMin = 0;
     const pMax = 4.5;
 
@@ -190,7 +190,7 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     ctx.strokeStyle = '#22c55e';
     ctx.lineWidth = 3;
     ctx.moveTo(toCanvasX(3.0), toCanvasY(3.0));
-    for (let stepX = 3.0; stepX <= 4.0; stepX += 0.02) {
+    for (let stepX = 3.0; stepX <= 4.2; stepX += 0.02) {
       const res = evalLegendre(stepX);
       ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
     }
@@ -223,7 +223,7 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     const margin = { left: 45, right: 30 };
     const width = rect.width;
     const xMin = 0;
-    const xMax = 4.2;
+    const xMax = 4.5;
 
     const targetX = xMin + ((clickX - margin.left) / (width - margin.left - margin.right)) * (xMax - xMin);
     if (targetX >= 0.05 && targetX <= 4.2) {

@@ -1,13 +1,19 @@
 import React, { useRef, useEffect } from 'react';
 import { LegendrePointState } from '../types/legendre';
 import { evalGP } from '../utils/mathEngine';
+import { Sliders } from 'lucide-react';
 
 interface GraphGPrimeProps {
   state: LegendrePointState;
   onChangeP: (p: number) => void;
+  heightClass?: string;
 }
 
-export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) => {
+export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
+  state,
+  onChangeP,
+  heightClass = 'h-72',
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -27,7 +33,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) =>
     const margin = { top: 30, right: 30, bottom: 40, left: 45 };
 
     const pMin = 0;
-    const pMax = 4.2;
+    const pMax = 4.5;
     const xMin = 0;
     const xMax = 4.5;
 
@@ -142,7 +148,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) =>
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(toCanvasP(3.0), toCanvasX(3.0));
-    for (let stepP = 3.0; stepP <= 4.0; stepP += 0.02) {
+    for (let stepP = 3.0; stepP <= 4.2; stepP += 0.02) {
       const cx = toCanvasP(stepP);
       const cy = toCanvasX(stepP);
       ctx.lineTo(cx, cy);
@@ -190,7 +196,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) =>
     const margin = { left: 45, right: 30 };
     const width = rect.width;
     const pMin = 0;
-    const pMax = 4.2;
+    const pMax = 4.5;
 
     const targetP = pMin + ((clickP - margin.left) / (width - margin.left - margin.right)) * (pMax - pMin);
     if (targetP >= 0.25 && targetP <= 4.2) {
@@ -199,7 +205,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) =>
   };
 
   return (
-    <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center space-y-2">
+    <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center space-y-3">
       {/* Header Info */}
       <div className="flex justify-between w-full mb-1 items-center px-1">
         <span className="text-sm font-bold text-teal-400">【双対幾何】 変換導関数 g'(p) = x (軸が逆転)</span>
@@ -209,9 +215,49 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) =>
       {/* Main Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-52 cursor-pointer rounded-lg bg-slate-900"
+        className={`w-full ${heightClass} cursor-pointer rounded-lg bg-slate-900`}
         onMouseDown={handlePointerDown}
       />
+
+      {/* Integrated p Slider directly below canvas */}
+      <div className="w-full bg-slate-900/90 p-3 rounded-lg border border-slate-700/80 space-y-2">
+        <div className="flex justify-between items-center">
+          <label className="text-xs font-bold text-teal-400 flex items-center gap-1.5">
+            <Sliders className="w-3.5 h-3.5" />
+            変換後の変数 p = f'(x) を変更:
+          </label>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-400 font-mono">p =</span>
+            <input
+              type="number"
+              min="0.25"
+              max="4.2"
+              step="0.01"
+              value={state.p.toFixed(2)}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val)) onChangeP(val);
+              }}
+              className="w-20 bg-slate-800 border border-slate-700 text-teal-300 font-mono font-bold text-xs px-2 py-0.5 rounded text-right focus:outline-none focus:border-teal-500"
+            />
+          </div>
+        </div>
+        <input
+          type="range"
+          min="0.25"
+          max="4.2"
+          step="0.01"
+          value={state.p}
+          onChange={(e) => onChangeP(parseFloat(e.target.value))}
+          className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-teal-500"
+        />
+        <div className="flex justify-between text-[10px] text-slate-400 font-mono px-1">
+          <span>0.25</span>
+          <span>p=1.0 (x: 1→2 垂直展開)</span>
+          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定)</span>
+          <span>4.2</span>
+        </div>
+      </div>
     </div>
   );
 };
