@@ -1,19 +1,20 @@
 import React, { useRef, useEffect } from 'react';
 import { LegendrePointState, LayerVisibility } from '../types/legendre';
 import { evalLegendre } from '../utils/mathEngine';
+import { Sliders } from 'lucide-react';
 
 interface GraphFPrimeProps {
   state: LegendrePointState;
-  visibility?: LayerVisibility;
+  visibility: LayerVisibility;
   onChangeX: (x: number) => void;
   heightClass?: string;
 }
 
 export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
   state,
-  visibility = { showRectangle: true, showFxArea: true, showGpArea: true },
+  visibility,
   onChangeX,
-  heightClass = 'h-72',
+  heightClass = 'h-96',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -119,7 +120,6 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
       ctx.lineTo(toCanvasX(0), toCanvasY(state.p));
       ctx.lineTo(toCanvasX(state.x), toCanvasY(state.p));
 
-      // Polygon contour following f'(x) back to origin
       for (let stepX = state.x; stepX >= 0.01; stepX -= 0.02) {
         const res = evalLegendre(stepX);
         ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
@@ -230,19 +230,63 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
   };
 
   return (
-    <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center w-full">
-      <div className="flex justify-between w-full mb-1 items-center px-1">
+    <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center w-full space-y-3">
+      {/* Header Info */}
+      <div className="flex justify-between w-full items-center px-1">
         <span className="text-sm font-bold text-emerald-400">【幾何学定義】 導関数 f'(x) と 面積分割</span>
         <div className="flex gap-3 text-xs">
-          <span className="text-sky-300">f(x)面積 = {state.fx.toFixed(3)}</span>
-          <span className="text-amber-400">g(p)面積 = {state.gp.toFixed(3)}</span>
+          <span className="text-sky-300">f(x)下面積 = {state.fx.toFixed(3)}</span>
+          <span className="text-amber-400">g(p)上面積 = {state.gp.toFixed(3)}</span>
         </div>
       </div>
+
+      {/* Main Canvas */}
       <canvas
         ref={canvasRef}
         className={`w-full ${heightClass} cursor-pointer rounded-lg bg-slate-900`}
         onMouseDown={handlePointerDown}
       />
+
+      {/* Integrated Slider directly below canvas */}
+      <div className="w-full bg-slate-900/90 p-3 rounded-lg border border-slate-700/80 space-y-2">
+        <div className="flex justify-between items-center">
+          <label className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+            <Sliders className="w-3.5 h-3.5" />
+            横軸 x の値を変更:
+          </label>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-400 font-mono">x =</span>
+            <input
+              type="number"
+              min="0.05"
+              max="4.2"
+              step="0.01"
+              value={state.x.toFixed(2)}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val)) onChangeX(val);
+              }}
+              className="w-20 bg-slate-800 border border-slate-700 text-sky-300 font-mono font-bold text-xs px-2 py-0.5 rounded text-right focus:outline-none focus:border-sky-500"
+            />
+          </div>
+        </div>
+        <input
+          type="range"
+          min="0.05"
+          max="4.2"
+          step="0.01"
+          value={state.x}
+          onChange={(e) => onChangeX(parseFloat(e.target.value))}
+          className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500"
+        />
+        <div className="flex justify-between text-[10px] text-slate-400 font-mono px-1">
+          <span>0.05</span>
+          <span>x=1.0 (平坦開始)</span>
+          <span>x=2.0 (平坦終了)</span>
+          <span>x=3.0 (不連続ジャンプ)</span>
+          <span>4.2</span>
+        </div>
+      </div>
     </div>
   );
 };

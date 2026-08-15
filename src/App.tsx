@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { ViewMode, LayerVisibility } from './types/legendre';
+import { LayerVisibility } from './types/legendre';
 import { evalLegendre } from './utils/mathEngine';
 import { Header } from './components/Header';
-import { ModeAView } from './components/ModeAView';
-import { ModeBView } from './components/ModeBView';
+import { GraphFPrime } from './components/GraphFPrime';
+import { GraphGP } from './components/GraphGP';
+import { Controls } from './components/Controls';
+import { MathFormula } from './components/MathFormula';
 
 export const App: React.FC = () => {
   // Default x=1.5 (flat region where p=1 constant, showcase key Shimizu textbook insight)
   const [x, setX] = useState<number>(1.5);
-  const [viewMode, setViewMode] = useState<ViewMode>('modeA');
   const [visibility, setVisibility] = useState<LayerVisibility>({
     showRectangle: true,
     showFxArea: true,
@@ -19,28 +20,32 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-sky-500 selection:text-white">
-      <Header viewMode={viewMode} onChangeViewMode={setViewMode} />
+      <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-        {viewMode === 'modeA' ? (
-          <ModeAView
-            state={state}
-            x={x}
-            onChangeX={setX}
-            viewMode={viewMode}
-            visibility={visibility}
-            onChangeVisibility={setVisibility}
-          />
-        ) : (
-          <ModeBView
-            state={state}
-            x={x}
-            onChangeX={setX}
-            viewMode={viewMode}
-            visibility={visibility}
-            onChangeVisibility={setVisibility}
-          />
-        )}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Main Focal Diagram Column (Left) */}
+          <div className="lg:col-span-7 space-y-4">
+            <GraphFPrime
+              state={state}
+              visibility={visibility}
+              onChangeX={setX}
+              heightClass="h-96"
+            />
+            <GraphGP state={state} onChangeX={setX} />
+          </div>
+
+          {/* Controls & Math Panel Column (Right) */}
+          <div className="lg:col-span-5 space-y-4">
+            <Controls
+              x={x}
+              onChangeX={setX}
+              visibility={visibility}
+              onChangeVisibility={setVisibility}
+            />
+            <MathFormula state={state} />
+          </div>
+        </div>
       </main>
 
       <footer className="bg-slate-950 border-t border-slate-800 text-slate-500 text-xs py-4 px-4 text-center space-y-1">
