@@ -65,7 +65,6 @@ export function evalLegendre(x: number): LegendrePointState {
 
 /**
  * g(p) 変換後の曲線を描画・取得するための補助関数
- * p に対応する g(p) を返す（不連続部 2 < p < 3 の直線補間を含む）
  */
 export function evalGP(p: number): { g: number; x: number | null; isInterpolated: boolean } {
   if (p < 0.25) {
@@ -91,5 +90,35 @@ export function evalGP(p: number): { g: number; x: number | null; isInterpolated
     const x = p;
     const fx = (Math.pow(x, 2) / 2) - 1.5;
     return { g: x * p - fx, x, isInterpolated: false };
+  }
+}
+
+/**
+ * p を操作した時に対応する x の値を導き出す逆写像関数
+ * @param p 変換後の独立変数 p = f'(x)
+ * @param currentX 現在の x の値 (p=1.0 の平坦領域での状態保持用)
+ */
+export function pToX(p: number, currentX: number = 1.5): number {
+  const clampP = Math.max(0.25, Math.min(p, 4.2));
+
+  if (clampP < 1.0) {
+    // Domain 1: p = (3x^2 + 1)/4 => x = sqrt((4p - 1)/3)
+    return Math.sqrt((4 * clampP - 1) / 3);
+  } else if (Math.abs(clampP - 1.0) < 0.01) {
+    // Domain 2 (Flat region p = 1.0): x in [1, 2)
+    // If currentX is already within [1.0, 2.0), preserve it; otherwise return 1.5
+    if (currentX >= 1.0 && currentX < 2.0) {
+      return currentX;
+    }
+    return 1.5;
+  } else if (clampP < 2.0) {
+    // Domain 3: p = x - 1 => x = p + 1
+    return clampP + 1.0;
+  } else if (clampP < 3.0) {
+    // Discontinuity gap 2 < p < 3: x is fixed at 3.0
+    return 3.0;
+  } else {
+    // Domain 4: p = x => x = p
+    return clampP;
   }
 }

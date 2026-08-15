@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evalLegendre, evalGP } from './mathEngine';
+import { evalLegendre, evalGP, pToX } from './mathEngine';
 
 describe('mathEngine - evalLegendre', () => {
   it('区間1 (0 < x < 1): x=0.5 のとき f(x)=0.15625, p=0.4375, g(p)=0.0625', () => {
@@ -37,7 +37,31 @@ describe('mathEngine - evalLegendre', () => {
   it('evalGP: 2 < p < 3 のギャップで直線補間 g(p) = 3p - 3 を評価する', () => {
     const res25 = evalGP(2.5);
     expect(res25.isInterpolated).toBe(true);
-    expect(res25.g).toBeCloseTo(4.5); // 3*(2.5) - 3 = 4.5
+    expect(res25.g).toBeCloseTo(4.5);
     expect(res25.x).toBe(3.0);
+  });
+});
+
+describe('mathEngine - pToX (逆写像 p -> x)', () => {
+  it('p=0.4375 (区間1) => x=0.5', () => {
+    const x = pToX(0.4375);
+    expect(x).toBeCloseTo(0.5);
+  });
+
+  it('p=1.0 (平坦部) => currentX が [1, 2) にあれば保持する', () => {
+    expect(pToX(1.0, 1.8)).toBe(1.8);
+    expect(pToX(1.0, 0.5)).toBe(1.5);
+  });
+
+  it('p=1.5 (区間3) => x=2.5', () => {
+    expect(pToX(1.5)).toBeCloseTo(2.5);
+  });
+
+  it('2 < p < 3 (ギャップ部) => x は 3.0 に固定される', () => {
+    expect(pToX(2.5)).toBe(3.0);
+  });
+
+  it('p=3.5 (区間4) => x=3.5', () => {
+    expect(pToX(3.5)).toBe(3.5);
   });
 });
