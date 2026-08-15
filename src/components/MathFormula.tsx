@@ -29,19 +29,14 @@ export const MathFormula: React.FC<MathFormulaProps> = ({ state }) => {
         </span>
       </div>
 
-      {/* Primary Geometric Formulas using Shimizu textbook notation */}
-      <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-700/50 space-y-3 text-center">
+      {/* Primary Geometric Formula using Shimizu textbook notation */}
+      <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-700/50 space-y-2 text-center">
         <div
-          className="text-lg font-bold text-slate-100"
+          className="text-lg font-bold text-slate-100 py-1"
           dangerouslySetInnerHTML={renderMath('g(p) = [x \\cdot p - f(x)](p)')}
         />
-        <div
-          className="text-base text-teal-400 font-bold border-t border-slate-800 pt-2.5"
-          dangerouslySetInnerHTML={renderMath('g\'(p) = \\frac{dg}{dp} = x')}
-        />
-        <p className="text-xs text-slate-400 leading-relaxed pt-1">
-          ルジャンドル変換の微分は元の変数 <span className="text-teal-300 font-mono font-semibold">x</span> に一致します！
-          そのため、中央の <span className="text-teal-400 font-mono font-bold">g'(p)</span> グラフは、上段の <span className="text-emerald-400 font-mono font-bold">f'(x)</span> グラフの縦軸と横軸を入れ替えた裏返し（双対）のグラフになります。
+        <p className="text-xs text-slate-400 leading-relaxed border-t border-slate-800 pt-2.5">
+          中央の <span className="text-teal-400 font-mono font-bold">g'(p) = x</span> グラフは、上段の <span className="text-emerald-400 font-mono font-bold">f'(x)</span> グラフの縦軸と横軸を入れ替えた裏返し（双対）の幾何学グラフになります。
         </p>
       </div>
 
