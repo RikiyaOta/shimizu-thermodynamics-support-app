@@ -1,0 +1,217 @@
+import React, { useRef, useEffect } from 'react';
+import { LegendrePointState } from '../types/legendre';
+import { evalGP } from '../utils/mathEngine';
+
+interface GraphGPrimeProps {
+  state: LegendrePointState;
+  onChangeP: (p: number) => void;
+}
+
+export const GraphGPrime: React.FC<GraphGPrimeProps> = ({ state, onChangeP }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = rect.width;
+    const height = rect.height;
+    const margin = { top: 30, right: 30, bottom: 40, left: 45 };
+
+    const pMin = 0;
+    const pMax = 4.2;
+    const xMin = 0;
+    const xMax = 4.5;
+
+    const toCanvasP = (val: number) => margin.left + ((val - pMin) / (pMax - pMin)) * (width - margin.left - margin.right);
+    const toCanvasX = (val: number) => height - margin.bottom - ((val - xMin) / (xMax - xMin)) * (height - margin.top - margin.bottom);
+
+    // Background & Grid
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+
+    for (let pVal = 0; pVal <= 4; pVal += 1) {
+      const cx = toCanvasP(pVal);
+      ctx.beginPath();
+      ctx.moveTo(cx, margin.top);
+      ctx.lineTo(cx, height - margin.bottom);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(pVal.toString(), cx, height - margin.bottom + 16);
+    }
+
+    for (let xVal = 0; xVal <= 4; xVal += 1) {
+      const cy = toCanvasX(xVal);
+      ctx.beginPath();
+      ctx.moveTo(margin.left, cy);
+      ctx.lineTo(width - margin.right, cy);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(xVal.toString(), margin.left - 6, cy + 4);
+    }
+
+    // Axes
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(margin.left, height - margin.bottom);
+    ctx.lineTo(width - margin.right, height - margin.bottom);
+    ctx.moveTo(margin.left, margin.top);
+    ctx.lineTo(margin.left, height - margin.bottom);
+    ctx.stroke();
+
+    // Domain dividers
+    [1, 2, 3].forEach((divP) => {
+      const cx = toCanvasP(divP);
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(cx, margin.top);
+      ctx.lineTo(cx, height - margin.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    for (let stepP = 0.25; stepP <= 1.0; stepP += 0.02) {
+      const res = evalGP(stepP);
+      if (res.x !== null) {
+        const cx = toCanvasP(stepP);
+        const cy = toCanvasX(res.x);
+        if (!started) {
+          ctx.moveTo(cx, cy);
+          started = true;
+        } else {
+          ctx.lineTo(cx, cy);
+        }
+      }
+    }
+    ctx.stroke();
+
+    // 2. Piece 2: p = 1.0 (Vertical Line Segment x from 1.0 to 2.0 - Flat region in f'(x) becomes vertical here!)
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(1.0), toCanvasX(1.0));
+    ctx.lineTo(toCanvasP(1.0), toCanvasX(2.0));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 3. Piece 3: 1.0 < p < 2.0 (Linear segment x = p + 1)
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(1.0), toCanvasX(2.0));
+    ctx.lineTo(toCanvasP(2.0), toCanvasX(3.0));
+    ctx.stroke();
+
+    // 4. Piece 4: 2.0 <= p <= 3.0 (Horizontal Flat Segment x = 3.0 - Jump in f'(x) becomes flat here!)
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(2.0), toCanvasX(3.0));
+    ctx.lineTo(toCanvasP(3.0), toCanvasX(3.0));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 5. Piece 5: p >= 3.0 (Linear segment x = p)
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(3.0), toCanvasX(3.0));
+    for (let stepP = 3.0; stepP <= 4.0; stepP += 0.02) {
+      const cx = toCanvasP(stepP);
+      const cy = toCanvasX(stepP);
+      ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Highlight current point (p, x)
+    const curCx = toCanvasP(state.p);
+    const curCy = toCanvasX(state.x);
+
+    ctx.fillStyle = '#34d399';
+    ctx.beginPath();
+    ctx.arc(curCx, curCy, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Highlight annotations
+    if (state.isFlatRegion) {
+      ctx.fillStyle = '#eab308';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`p=1 で x=1→2 へ垂直展開`, curCx + 10, curCy);
+    } else if (state.p >= 2.0 && state.p <= 3.0 && Math.abs(state.x - 3.0) < 0.05) {
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`x=3.0 で p:2→3 へ水平展開`, curCx + 10, curCy - 5);
+    }
+
+    // Axis Labels
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('p = f\'(x)', width - margin.right + 15, height - margin.bottom + 4);
+    ctx.fillText('g\'(p) = x', margin.left, margin.top - 12);
+  }, [state]);
+
+  const handlePointerDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const clickP = e.clientX - rect.left;
+    const margin = { left: 45, right: 30 };
+    const width = rect.width;
+    const pMin = 0;
+    const pMax = 4.2;
+
+    const targetP = pMin + ((clickP - margin.left) / (width - margin.left - margin.right)) * (pMax - pMin);
+    if (targetP >= 0.25 && targetP <= 4.2) {
+      onChangeP(targetP);
+    }
+  };
+
+  return (
+    <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center space-y-2">
+      {/* Header Info */}
+      <div className="flex justify-between w-full mb-1 items-center px-1">
+        <span className="text-sm font-bold text-teal-400">【双対幾何】 変換導関数 g'(p) = x (軸が逆転)</span>
+        <span className="text-xs text-slate-400">g'({state.p.toFixed(2)}) = {state.x.toFixed(2)}</span>
+      </div>
+
+      {/* Main Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="w-full h-52 cursor-pointer rounded-lg bg-slate-900"
+        onMouseDown={handlePointerDown}
+      />
+    </div>
+  );
+};

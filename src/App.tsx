@@ -3,6 +3,7 @@ import { LayerVisibility } from './types/legendre';
 import { evalLegendre, pToX } from './utils/mathEngine';
 import { Header } from './components/Header';
 import { GraphFPrime } from './components/GraphFPrime';
+import { GraphGPrime } from './components/GraphGPrime';
 import { GraphGP } from './components/GraphGP';
 import { MathFormula } from './components/MathFormula';
 
@@ -41,20 +42,26 @@ export const App: React.FC = () => {
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Main Focal Diagram Column (Left) */}
+          {/* Main 3 Stacked Diagrams Column (Left: f'(x) -> g'(p) -> g(p)) */}
           <div className="lg:col-span-7 space-y-4">
+            {/* 1. f'(x) vs x */}
             <GraphFPrime
               state={state}
               visibility={visibility}
               onChangeVisibility={setVisibility}
               onChangeX={handleXChange}
-              heightClass="h-96"
+              heightClass="h-80"
             />
+
+            {/* 2. g'(p) = x vs p (Axis Swapped Dual Graph) */}
+            <GraphGPrime state={state} onChangeP={handlePChange} />
+
+            {/* 3. g(p) vs p */}
             <GraphGP state={state} onChangeP={handlePChange} />
           </div>
 
           {/* Math Breakdown & Textbook Commentary Column (Right) */}
-          <div className="lg:col-span-5 space-y-4">
+          <div className="lg:col-span-5 space-y-4 sticky top-20">
             <MathFormula state={state} />
           </div>
         </div>

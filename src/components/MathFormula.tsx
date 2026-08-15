@@ -1,7 +1,7 @@
 import React from 'react';
 import { LegendrePointState } from '../types/legendre';
 import katex from 'katex';
-import { Calculator, Info, AlertTriangle } from 'lucide-react';
+import { Calculator, Info, AlertTriangle, ArrowLeftRight } from 'lucide-react';
 
 interface MathFormulaProps {
   state: LegendrePointState;
@@ -31,14 +31,19 @@ export const MathFormula: React.FC<MathFormulaProps> = ({ state }) => {
         </span>
       </div>
 
-      {/* Primary Geometric Formula */}
-      <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-700/50 space-y-2 text-center">
+      {/* Primary Geometric Formulas */}
+      <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-700/50 space-y-3 text-center">
         <div
           className="text-base text-slate-100"
           dangerouslySetInnerHTML={renderMath('g(p) = x \\cdot p - f(x)')}
         />
+        <div
+          className="text-sm text-teal-400 font-bold border-t border-slate-800 pt-2"
+          dangerouslySetInnerHTML={renderMath('g\'(p) = \\frac{dg}{dp} = x')}
+        />
         <p className="text-xs text-slate-400">
-          「長方形の面積 <span className="text-slate-200 font-mono">xp</span>」から「積分領域 <span className="text-sky-400 font-mono">f(x)</span>」を引き算した領域が「ルジャンドル変換 <span className="text-amber-400 font-mono">g(p)</span>」の面積です。
+          ルジャンドル変換の微分は元の変数 <span className="text-teal-300 font-mono">x</span> に一致します！
+          そのため、中央の <span className="text-teal-400 font-mono font-bold">g'(p)</span> グラフは、上段の <span className="text-emerald-400 font-mono font-bold">f'(x)</span> グラフの縦軸と横軸を入れ替えた裏返し（双対）のグラフになります。
         </p>
       </div>
 
@@ -61,6 +66,20 @@ export const MathFormula: React.FC<MathFormulaProps> = ({ state }) => {
           <span className="font-mono text-amber-300 text-sm font-bold">{state.gp.toFixed(3)}</span>
           <span className="text-[10px] text-slate-500 block">{rectArea.toFixed(3)} - {state.fx.toFixed(3)}</span>
         </div>
+      </div>
+
+      {/* Dual Property Highlight Box */}
+      <div className="bg-teal-500/10 border border-teal-500/30 p-2.5 rounded-lg text-xs space-y-1">
+        <span className="font-bold text-teal-300 flex items-center gap-1">
+          <ArrowLeftRight className="w-3.5 h-3.5" />
+          熱力学の双対性 (Dual Nature)
+        </span>
+        <p className="text-slate-300 text-[11px]">
+          • <span className="text-amber-300 font-bold">f'(x) で平坦</span> だった部分 ($x \in [1,2], p=1$) $\implies$ <span className="text-amber-300 font-bold">g'(p) では垂直線</span> ($p=1, x:1 \to 2$)
+        </p>
+        <p className="text-slate-300 text-[11px]">
+          • <span className="text-rose-300 font-bold">f'(x) でジャンプ</span> だった部分 ($x=3, p:2 \to 3$) $\implies$ <span className="text-rose-300 font-bold">g'(p) では水平線</span> ($x=3, p:2 \to 3$)
+        </p>
       </div>
 
       {/* Shimizu Textbook Insight Commentary Card */}
