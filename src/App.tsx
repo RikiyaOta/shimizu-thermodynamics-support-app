@@ -5,6 +5,7 @@ import { GraphFPrime } from './components/GraphFPrime';
 import { GraphGPrime } from './components/GraphGPrime';
 import { GraphGP } from './components/GraphGP';
 import { MathFormula } from './components/MathFormula';
+import { FunctionDefinition } from './components/FunctionDefinition';
 
 export const App: React.FC = () => {
   // Default x=1.5 (flat region where p=1 constant, showcase key Shimizu textbook insight)
@@ -51,9 +52,10 @@ export const App: React.FC = () => {
             <GraphGP state={state} onChangeP={handlePChange} />
           </div>
 
-          {/* Math Breakdown & Textbook Commentary Column (Right) */}
+          {/* Math Breakdown & Function Definition Column (Right) */}
           <div className="lg:col-span-5 space-y-4 sticky top-20">
             <MathFormula state={state} />
+            <FunctionDefinition state={state} />
           </div>
         </div>
       </main>
