@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { LayerVisibility } from './types/legendre';
 import { evalLegendre, pToX } from './utils/mathEngine';
 import { Header } from './components/Header';
 import { GraphFPrime } from './components/GraphFPrime';
@@ -11,12 +10,6 @@ export const App: React.FC = () => {
   // Default x=1.5 (flat region where p=1 constant, showcase key Shimizu textbook insight)
   const [x, setX] = useState<number>(1.5);
   const [overrideP, setOverrideP] = useState<number | undefined>(undefined);
-
-  const [visibility, setVisibility] = useState<LayerVisibility>({
-    showRectangle: true,
-    showFxArea: true,
-    showGpArea: true,
-  });
 
   const state = useMemo(() => evalLegendre(x, overrideP), [x, overrideP]);
 
@@ -47,8 +40,6 @@ export const App: React.FC = () => {
             {/* 1. f'(x) vs x */}
             <GraphFPrime
               state={state}
-              visibility={visibility}
-              onChangeVisibility={setVisibility}
               onChangeX={handleXChange}
               heightClass="h-80"
             />

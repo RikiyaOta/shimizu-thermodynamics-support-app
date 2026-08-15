@@ -9,11 +9,3 @@ export interface LegendrePointState {
   isDiscontinuityPoint: boolean; // x = 3
   descriptionJa: string;
 }
-
-export type ViewMode = 'modeA' | 'modeB';
-
-export interface LayerVisibility {
-  showRectangle: boolean;
-  showFxArea: boolean;
-  showGpArea: boolean;
-}

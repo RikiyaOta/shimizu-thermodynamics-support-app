@@ -1,20 +1,16 @@
 import React, { useRef, useEffect } from 'react';
-import { LegendrePointState, LayerVisibility } from '../types/legendre';
+import { LegendrePointState } from '../types/legendre';
 import { evalLegendre } from '../utils/mathEngine';
-import { Sliders, Layers } from 'lucide-react';
+import { Sliders } from 'lucide-react';
 
 interface GraphFPrimeProps {
   state: LegendrePointState;
-  visibility: LayerVisibility;
-  onChangeVisibility: (updater: (prev: LayerVisibility) => LayerVisibility) => void;
   onChangeX: (x: number) => void;
   heightClass?: string;
 }
 
 export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
   state,
-  visibility,
-  onChangeVisibility,
   onChangeX,
   heightClass = 'h-72',
 }) => {
@@ -100,49 +96,43 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     });
 
     // 1. Shaded Area: Integral f(x) (Cyan) under f'(x)
-    if (visibility.showFxArea) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
-      ctx.beginPath();
-      ctx.moveTo(toCanvasX(0), toCanvasY(0));
-      for (let stepX = 0.01; stepX <= state.x; stepX += 0.02) {
-        const res = evalLegendre(stepX);
-        ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
-      }
-      ctx.lineTo(toCanvasX(state.x), toCanvasY(state.p));
-      ctx.lineTo(toCanvasX(state.x), toCanvasY(0));
-      ctx.closePath();
-      ctx.fill();
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), toCanvasY(0));
+    for (let stepX = 0.01; stepX <= state.x; stepX += 0.02) {
+      const res = evalLegendre(stepX);
+      ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
     }
+    ctx.lineTo(toCanvasX(state.x), toCanvasY(state.p));
+    ctx.lineTo(toCanvasX(state.x), toCanvasY(0));
+    ctx.closePath();
+    ctx.fill();
 
     // 2. Shaded Area: Legendre g(p) (Orange) above f'(x) within rectangle
-    if (visibility.showGpArea) {
-      ctx.fillStyle = 'rgba(249, 115, 22, 0.35)';
-      ctx.beginPath();
-      ctx.moveTo(toCanvasX(0), toCanvasY(0));
-      ctx.lineTo(toCanvasX(0), toCanvasY(state.p));
-      ctx.lineTo(toCanvasX(state.x), toCanvasY(state.p));
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), toCanvasY(0));
+    ctx.lineTo(toCanvasX(0), toCanvasY(state.p));
+    ctx.lineTo(toCanvasX(state.x), toCanvasY(state.p));
 
-      for (let stepX = state.x; stepX >= 0.01; stepX -= 0.02) {
-        const res = evalLegendre(stepX);
-        ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
-      }
-      ctx.closePath();
-      ctx.fill();
+    for (let stepX = state.x; stepX >= 0.01; stepX -= 0.02) {
+      const res = evalLegendre(stepX);
+      ctx.lineTo(toCanvasX(stepX), toCanvasY(res.p));
     }
+    ctx.closePath();
+    ctx.fill();
 
     // 3. Rectangle xp Outline
-    if (visibility.showRectangle) {
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([5, 4]);
-      ctx.strokeRect(
-        toCanvasX(0),
-        toCanvasY(state.p),
-        toCanvasX(state.x) - toCanvasX(0),
-        toCanvasY(0) - toCanvasY(state.p)
-      );
-      ctx.setLineDash([]);
-    }
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 4]);
+    ctx.strokeRect(
+      toCanvasX(0),
+      toCanvasY(state.p),
+      toCanvasX(state.x) - toCanvasX(0),
+      toCanvasY(0) - toCanvasY(state.p)
+    );
+    ctx.setLineDash([]);
 
     // Derivative Curve f'(x)
     ctx.strokeStyle = '#22c55e';
@@ -213,7 +203,7 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     ctx.textAlign = 'center';
     ctx.fillText('x', width - margin.right + 15, height - margin.bottom + 4);
     ctx.fillText("f'(x) = p", margin.left, margin.top - 12);
-  }, [state, visibility]);
+  }, [state]);
 
   const handlePointerDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -233,43 +223,12 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
 
   return (
     <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center w-full space-y-3">
-      {/* Header Info & Layer Checkboxes */}
-      <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center gap-2 px-1">
+      {/* Header Info */}
+      <div className="flex justify-between w-full items-center px-1">
         <span className="text-sm font-bold text-emerald-400">【幾何学定義】 導関数 f'(x) と 面積分割</span>
-        
-        {/* Layer checkboxes integrated directly in canvas header */}
-        <div className="flex items-center gap-3 text-xs bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700/60">
-          <span className="text-slate-400 font-semibold flex items-center gap-1">
-            <Layers className="w-3 h-3 text-emerald-400" />
-            表示:
-          </span>
-          <label className="flex items-center gap-1 cursor-pointer text-slate-300">
-            <input
-              type="checkbox"
-              checked={visibility.showRectangle}
-              onChange={() => onChangeVisibility((prev) => ({ ...prev, showRectangle: !prev.showRectangle }))}
-              className="rounded accent-slate-300"
-            />
-            長方形 xp
-          </label>
-          <label className="flex items-center gap-1 cursor-pointer text-sky-300">
-            <input
-              type="checkbox"
-              checked={visibility.showFxArea}
-              onChange={() => onChangeVisibility((prev) => ({ ...prev, showFxArea: !prev.showFxArea }))}
-              className="rounded accent-sky-500"
-            />
-            下面積 f(x)
-          </label>
-          <label className="flex items-center gap-1 cursor-pointer text-amber-400">
-            <input
-              type="checkbox"
-              checked={visibility.showGpArea}
-              onChange={() => onChangeVisibility((prev) => ({ ...prev, showGpArea: !prev.showGpArea }))}
-              className="rounded accent-amber-500"
-            />
-            上面積 g(p)
-          </label>
+        <div className="flex gap-3 text-xs font-mono">
+          <span className="text-sky-300">f(x)下面積: {state.fx.toFixed(3)}</span>
+          <span className="text-amber-400">g(p)上面積: {state.gp.toFixed(3)}</span>
         </div>
       </div>
 
