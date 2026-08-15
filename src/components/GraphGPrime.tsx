@@ -95,12 +95,10 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       ctx.setLineDash([]);
     });
 
-    // Solid Continuous Curve g'(p) = x
+    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
     ctx.strokeStyle = '#34d399';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-
-    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
     let started = false;
     for (let stepP = 0.25; stepP <= 1.0; stepP += 0.02) {
       const res = evalGP(stepP);
@@ -115,16 +113,26 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
         }
       }
     }
+    ctx.stroke();
 
-    // 2. Piece 2: p = 1.0 (Vertical Line Segment x: 1.0 -> 2.0)
+    // 2. Piece 2: p = 1.0 (Dotted Vertical Line Segment x: 1.0 -> 2.0 - Non-differentiable jump in g'(p)!)
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(1.0), toCanvasX(1.0));
     ctx.lineTo(toCanvasP(1.0), toCanvasX(2.0));
+    ctx.stroke();
+    ctx.setLineDash([]);
 
     // 3. Piece 3: 1.0 < p < 2.0 (Linear segment x = p + 1)
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(1.0), toCanvasX(2.0));
     ctx.lineTo(toCanvasP(2.0), toCanvasX(3.0));
-
-    // 4. Piece 4: 2.0 <= p <= 3.0 (Horizontal Segment x = 3.0)
+    // 4. Piece 4: 2.0 <= p <= 3.0 (Solid Horizontal Segment x = 3.0 - Continuous constant derivative g'(p) = 3!)
     ctx.lineTo(toCanvasP(3.0), toCanvasX(3.0));
-
     // 5. Piece 5: p >= 3.0 (Linear segment x = p)
     for (let stepP = 3.0; stepP <= 4.2; stepP += 0.02) {
       ctx.lineTo(toCanvasP(stepP), toCanvasX(stepP));
@@ -148,12 +156,12 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       ctx.fillStyle = '#eab308';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`p=1 で x=1→2 へ垂直展開`, curCx + 10, curCy);
+      ctx.fillText(`p=1 で x=1→2 へ不連続跳躍 (微分非存在)`, curCx + 10, curCy);
     } else if (state.p >= 2.0 && state.p <= 3.0 && Math.abs(state.x - 3.0) < 0.05) {
       ctx.fillStyle = '#f59e0b';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`x=3.0 固定 (2<=p<=3) 水平展開`, curCx + 10, curCy - 5);
+      ctx.fillText(`x=3.0 固定 (2<=p<=3) 連続な水平微分線段`, curCx + 10, curCy - 5);
     }
 
     // Axis Labels
@@ -229,8 +237,8 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
         />
         <div className="flex justify-between text-[10px] text-slate-400 font-mono px-1">
           <span>0.25</span>
-          <span>p=1.0 (x: 1→2 垂直展開)</span>
-          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定)</span>
+          <span>p=1.0 (x: 1→2 跳躍点線)</span>
+          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定 連続実線)</span>
           <span>4.2</span>
         </div>
       </div>
