@@ -95,7 +95,55 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       ctx.setLineDash([]);
     });
 
-    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
+    // Helper: compute g'(p) = x for any stepP in [0.25, 4.2]
+    const getPointForP = (stepP: number) => {
+      if (stepP >= 2.0 && stepP <= 3.0) {
+        return { p: stepP, x: 3.0 };
+      }
+      const res = evalGP(stepP);
+      return { p: stepP, x: res.x ?? 0 };
+    };
+
+    // 1. Shaded Area: Integral g(p) (Orange) UNDER g'(p) curve
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(0), toCanvasX(0));
+    for (let stepP = 0.25; stepP <= state.p; stepP += 0.02) {
+      const pt = getPointForP(stepP);
+      ctx.lineTo(toCanvasP(pt.p), toCanvasX(pt.x));
+    }
+    ctx.lineTo(toCanvasP(state.p), toCanvasX(state.x));
+    ctx.lineTo(toCanvasP(state.p), toCanvasX(0));
+    ctx.closePath();
+    ctx.fill();
+
+    // 2. Shaded Area: Integral f(x) (Cyan) ABOVE g'(p) curve within rectangle
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+    ctx.beginPath();
+    ctx.moveTo(toCanvasP(0), toCanvasX(0));
+    ctx.lineTo(toCanvasP(0), toCanvasX(state.x));
+    ctx.lineTo(toCanvasP(state.p), toCanvasX(state.x));
+
+    for (let stepP = state.p; stepP >= 0.25; stepP -= 0.02) {
+      const pt = getPointForP(stepP);
+      ctx.lineTo(toCanvasP(pt.p), toCanvasX(pt.x));
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // 3. Rectangle px Outline
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 4]);
+    ctx.strokeRect(
+      toCanvasP(0),
+      toCanvasX(state.x),
+      toCanvasP(state.p) - toCanvasP(0),
+      toCanvasX(0) - toCanvasX(state.x)
+    );
+    ctx.setLineDash([]);
+
+    // 4. Piece 1: 0.25 <= p < 1.0 (Curve)
     ctx.strokeStyle = '#34d399';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -115,7 +163,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
     }
     ctx.stroke();
 
-    // 2. Piece 2: p = 1.0 (Dotted Vertical Line Segment x: 1.0 -> 2.0 - Non-differentiable jump in g'(p)!)
+    // 5. Piece 2: p = 1.0 (Dotted Vertical Line Segment x: 1.0 -> 2.0)
     ctx.strokeStyle = '#eab308';
     ctx.lineWidth = 2;
     ctx.setLineDash([4, 4]);
@@ -125,15 +173,15 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // 3. Piece 3: 1.0 < p < 2.0 (Linear segment x = p + 1)
+    // 6. Piece 3: 1.0 < p < 2.0 (Linear segment x = p + 1)
     ctx.strokeStyle = '#34d399';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(toCanvasP(1.0), toCanvasX(2.0));
     ctx.lineTo(toCanvasP(2.0), toCanvasX(3.0));
-    // 4. Piece 4: 2.0 <= p <= 3.0 (Solid Horizontal Segment x = 3.0 - Continuous constant derivative g'(p) = 3!)
+    // 7. Piece 4: 2.0 <= p <= 3.0 (Solid Horizontal Segment x = 3.0)
     ctx.lineTo(toCanvasP(3.0), toCanvasX(3.0));
-    // 5. Piece 5: p >= 3.0 (Linear segment x = p)
+    // 8. Piece 5: p >= 3.0 (Linear segment x = p)
     for (let stepP = 3.0; stepP <= 4.2; stepP += 0.02) {
       ctx.lineTo(toCanvasP(stepP), toCanvasX(stepP));
     }
@@ -193,7 +241,10 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       {/* Header Info */}
       <div className="flex justify-between w-full mb-1 items-center px-1">
         <span className="text-sm font-bold text-teal-400">【双対幾何】 変換導関数 g'(p) = x (軸が逆転)</span>
-        <span className="text-xs text-slate-400">g'({state.p.toFixed(2)}) = {state.x.toFixed(2)}</span>
+        <div className="flex gap-3 text-xs font-mono">
+          <span className="text-amber-400">g(p)下面積: {state.gp.toFixed(3)}</span>
+          <span className="text-sky-300">f(x)上面積: {state.fx.toFixed(3)}</span>
+        </div>
       </div>
 
       {/* Main Canvas */}
