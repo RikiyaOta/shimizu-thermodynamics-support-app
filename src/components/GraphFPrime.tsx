@@ -32,13 +32,20 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     const height = rect.height;
     const margin = { top: 30, right: 30, bottom: 40, left: 45 };
 
+    const availableW = width - margin.left - margin.right;
+    const availableH = height - margin.top - margin.bottom;
+    const side = Math.min(availableW, availableH);
+
+    const plotLeft = margin.left + (availableW - side) / 2;
+    const plotTop = margin.top + (availableH - side) / 2;
+
     const xMin = 0;
     const xMax = 4.5;
     const pMin = 0;
     const pMax = 4.5;
 
-    const toCanvasX = (val: number) => margin.left + ((val - xMin) / (xMax - xMin)) * (width - margin.left - margin.right);
-    const toCanvasY = (val: number) => height - margin.bottom - ((val - pMin) / (pMax - pMin)) * (height - margin.top - margin.bottom);
+    const toCanvasX = (val: number) => plotLeft + ((val - xMin) / (xMax - xMin)) * side;
+    const toCanvasY = (val: number) => plotTop + side - ((val - pMin) / (pMax - pMin)) * side;
 
     // Background & Grid
     ctx.fillStyle = '#0f172a';
@@ -50,37 +57,37 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     for (let xVal = 0; xVal <= 4; xVal += 1) {
       const cx = toCanvasX(xVal);
       ctx.beginPath();
-      ctx.moveTo(cx, margin.top);
-      ctx.lineTo(cx, height - margin.bottom);
+      ctx.moveTo(cx, plotTop);
+      ctx.lineTo(cx, plotTop + side);
       ctx.stroke();
 
       ctx.fillStyle = '#64748b';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(xVal.toString(), cx, height - margin.bottom + 16);
+      ctx.fillText(xVal.toString(), cx, plotTop + side + 16);
     }
 
     for (let pVal = 0; pVal <= 4; pVal += 1) {
       const cy = toCanvasY(pVal);
       ctx.beginPath();
-      ctx.moveTo(margin.left, cy);
-      ctx.lineTo(width - margin.right, cy);
+      ctx.moveTo(plotLeft, cy);
+      ctx.lineTo(plotLeft + side, cy);
       ctx.stroke();
 
       ctx.fillStyle = '#64748b';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(pVal.toString(), margin.left - 6, cy + 4);
+      ctx.fillText(pVal.toString(), plotLeft - 6, cy + 4);
     }
 
     // Axes
     ctx.strokeStyle = '#475569';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(margin.left, height - margin.bottom);
-    ctx.lineTo(width - margin.right, height - margin.bottom);
-    ctx.moveTo(margin.left, margin.top);
-    ctx.lineTo(margin.left, height - margin.bottom);
+    ctx.moveTo(plotLeft, plotTop + side);
+    ctx.lineTo(plotLeft + side, plotTop + side);
+    ctx.moveTo(plotLeft, plotTop);
+    ctx.lineTo(plotLeft, plotTop + side);
     ctx.stroke();
 
     // Domain dividers
@@ -89,8 +96,8 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
       ctx.setLineDash([4, 4]);
       ctx.strokeStyle = '#334155';
       ctx.beginPath();
-      ctx.moveTo(cx, margin.top);
-      ctx.lineTo(cx, height - margin.bottom);
+      ctx.moveTo(cx, plotTop);
+      ctx.lineTo(cx, plotTop + side);
       ctx.stroke();
       ctx.setLineDash([]);
     });
@@ -201,8 +208,8 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     ctx.fillStyle = '#94a3b8';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('x', width - margin.right + 15, height - margin.bottom + 4);
-    ctx.fillText("f'(x) = p", margin.left, margin.top - 12);
+    ctx.fillText('x', plotLeft + side + 15, plotTop + side + 4);
+    ctx.fillText("f'(x) = p", plotLeft, plotTop - 12);
   }, [state]);
 
   const handlePointerDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -210,12 +217,17 @@ export const GraphFPrime: React.FC<GraphFPrimeProps> = ({
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
-    const margin = { left: 45, right: 30 };
-    const width = rect.width;
+    const margin = { top: 30, right: 30, bottom: 40, left: 45 };
+
+    const availableW = rect.width - margin.left - margin.right;
+    const availableH = rect.height - margin.top - margin.bottom;
+    const side = Math.min(availableW, availableH);
+    const plotLeft = margin.left + (availableW - side) / 2;
+
     const xMin = 0;
     const xMax = 4.5;
 
-    const targetX = xMin + ((clickX - margin.left) / (width - margin.left - margin.right)) * (xMax - xMin);
+    const targetX = xMin + ((clickX - plotLeft) / side) * (xMax - xMin);
     if (targetX >= 0.05 && targetX <= 4.2) {
       onChangeX(targetX);
     }
