@@ -95,10 +95,12 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       ctx.setLineDash([]);
     });
 
-    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
+    // Solid Continuous Curve g'(p) = x
     ctx.strokeStyle = '#34d399';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
+
+    // 1. Piece 1: 0.25 <= p < 1.0 (Curve)
     let started = false;
     for (let stepP = 0.25; stepP <= 1.0; stepP += 0.02) {
       const res = evalGP(stepP);
@@ -113,45 +115,19 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
         }
       }
     }
-    ctx.stroke();
 
-    // 2. Piece 2: p = 1.0 (Vertical Line Segment x from 1.0 to 2.0 - Flat region in f'(x) becomes vertical here!)
-    ctx.strokeStyle = '#eab308';
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(toCanvasP(1.0), toCanvasX(1.0));
+    // 2. Piece 2: p = 1.0 (Vertical Line Segment x: 1.0 -> 2.0)
     ctx.lineTo(toCanvasP(1.0), toCanvasX(2.0));
-    ctx.stroke();
-    ctx.setLineDash([]);
 
     // 3. Piece 3: 1.0 < p < 2.0 (Linear segment x = p + 1)
-    ctx.strokeStyle = '#34d399';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(toCanvasP(1.0), toCanvasX(2.0));
     ctx.lineTo(toCanvasP(2.0), toCanvasX(3.0));
-    ctx.stroke();
 
-    // 4. Piece 4: 2.0 <= p <= 3.0 (Horizontal Flat Segment x = 3.0 - Jump in f'(x) becomes flat here!)
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(toCanvasP(2.0), toCanvasX(3.0));
+    // 4. Piece 4: 2.0 <= p <= 3.0 (Horizontal Segment x = 3.0)
     ctx.lineTo(toCanvasP(3.0), toCanvasX(3.0));
-    ctx.stroke();
-    ctx.setLineDash([]);
 
     // 5. Piece 5: p >= 3.0 (Linear segment x = p)
-    ctx.strokeStyle = '#34d399';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(toCanvasP(3.0), toCanvasX(3.0));
     for (let stepP = 3.0; stepP <= 4.2; stepP += 0.02) {
-      const cx = toCanvasP(stepP);
-      const cy = toCanvasX(stepP);
-      ctx.lineTo(cx, cy);
+      ctx.lineTo(toCanvasP(stepP), toCanvasX(stepP));
     }
     ctx.stroke();
 
@@ -177,7 +153,7 @@ export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
       ctx.fillStyle = '#f59e0b';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`x=3.0 で p:2→3 へ水平展開`, curCx + 10, curCy - 5);
+      ctx.fillText(`x=3.0 固定 (2<=p<=3) 水平展開`, curCx + 10, curCy - 5);
     }
 
     // Axis Labels

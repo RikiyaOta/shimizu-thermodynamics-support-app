@@ -78,7 +78,7 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
     ctx.lineTo(margin.left, height - margin.bottom);
     ctx.stroke();
 
-    // g(p) Curve
+    // Solid Continuous Curve g(p)
     ctx.strokeStyle = '#f97316';
     ctx.lineWidth = 2.5;
 
@@ -96,16 +96,6 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
       }
     }
     ctx.stroke();
-
-    // Highlight interpolated segment 2 < p < 3 (Discontinuity gap fill)
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(toCanvasP(2.0), toCanvasG(3.0));
-    ctx.lineTo(toCanvasP(3.0), toCanvasG(6.0));
-    ctx.stroke();
-    ctx.setLineDash([]);
 
     // Highlight current point
     const curCx = toCanvasP(state.p);
@@ -129,7 +119,7 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
       ctx.fillStyle = '#f59e0b';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`x=3.0 固定 (2<=p<=3) 直線補間`, curCx + 10, curCy - 5);
+      ctx.fillText(`x=3.0 固定 (2<=p<=3) 直線補間 g(p)=3p-3`, curCx + 10, curCy - 5);
     }
 
     // Axis Labels
@@ -206,7 +196,7 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
         <div className="flex justify-between text-[10px] text-slate-400 font-mono px-1">
           <span>0.25</span>
           <span>p=1.0 (平坦部: g=0.5)</span>
-          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定 直線補間)</span>
+          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定)</span>
           <span>4.2</span>
         </div>
       </div>
