@@ -17,10 +17,10 @@ export const FunctionDefinition: React.FC<FunctionDefinitionProps> = ({ state })
   };
 
   const domainRows = [
-    { index: 1, latex: 'f(x) = \\frac{x^3 + x}{4}', condition: '0 < x < 1', name: '三次関数部' },
-    { index: 2, latex: 'f(x) = x - \\frac{1}{2}', condition: '1 \\le x < 2', name: '平坦領域 (f\'=1)' },
-    { index: 3, latex: 'f(x) = \\frac{x^2}{2} - x + \\frac{3}{2}', condition: '2 \\le x < 3', name: '一次導関数部' },
-    { index: 4, latex: 'f(x) = \\frac{x^2}{2} - \\frac{3}{2}', condition: '3 \\le x', name: '二次関数部' },
+    { index: 1, latex: 'f(x) = \\frac{x^3 + x}{4}', condition: '0 < x < 1' },
+    { index: 2, latex: 'f(x) = x - \\frac{1}{2}', condition: '1 \\le x < 2' },
+    { index: 3, latex: 'f(x) = \\frac{x^2}{2} - x + \\frac{3}{2}', condition: '2 \\le x < 3' },
+    { index: 4, latex: 'f(x) = \\frac{x^2}{2} - \\frac{3}{2}', condition: '3 \\le x' },
   ];
 
   return (
@@ -28,7 +28,7 @@ export const FunctionDefinition: React.FC<FunctionDefinitionProps> = ({ state })
       {/* Title */}
       <div className="flex items-center gap-2 pb-2 border-b border-slate-700/60 text-base font-bold text-sky-400">
         <BookMarked className="w-5 h-5" />
-        対象関数 f(x) のピースワイズ定義式
+        関数 f(x) の定義
       </div>
 
       {/* Piecewise Formula Rows with Active Highlighting */}
@@ -59,12 +59,13 @@ export const FunctionDefinition: React.FC<FunctionDefinitionProps> = ({ state })
               </div>
 
               <div className="flex items-center gap-2 text-xs font-mono self-end sm:self-auto">
-                <span className={isActive ? 'text-amber-300 font-semibold' : 'text-slate-500'}>
-                  ({row.condition})
-                </span>
+                <span
+                  className={isActive ? 'text-amber-300 font-semibold' : 'text-slate-400'}
+                  dangerouslySetInnerHTML={renderMath(`(${row.condition})`)}
+                />
                 {isActive && (
                   <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded font-sans">
-                    現在選択中
+                    選択中
                   </span>
                 )}
               </div>
@@ -72,10 +73,6 @@ export const FunctionDefinition: React.FC<FunctionDefinitionProps> = ({ state })
           );
         })}
       </div>
-
-      <p className="text-[11px] text-slate-400 leading-relaxed pt-1">
-        ※ 清水明『熱力学の基礎（第2版）』テキスト特有の、平坦部および不連続ジャンプを含む重要な例題関数です。
-      </p>
     </div>
   );
 };
