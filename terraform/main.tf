@@ -24,6 +24,7 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
+# Direct Upload Cloudflare Pages Project (Deployed automatically via GitHub Actions cloudflare/pages-action)
 resource "cloudflare_pages_project" "support_app" {
   account_id        = var.cloudflare_account_id
   name              = var.project_name
@@ -33,17 +34,5 @@ resource "cloudflare_pages_project" "support_app" {
     build_command   = "pnpm build"
     destination_dir = "dist"
     root_dir        = ""
-  }
-
-  source {
-    type = "github"
-    config {
-      owner                         = "RikiyaOta"
-      repo_name                     = "shimizu-thermodynamics-support-app"
-      production_branch             = "main"
-      pr_comments_enabled           = true
-      deployments_enabled           = true
-      production_deployment_enabled = true
-    }
   }
 }
