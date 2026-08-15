@@ -4,7 +4,6 @@ import { evalLegendre } from './utils/mathEngine';
 import { Header } from './components/Header';
 import { GraphFPrime } from './components/GraphFPrime';
 import { GraphGP } from './components/GraphGP';
-import { Controls } from './components/Controls';
 import { MathFormula } from './components/MathFormula';
 
 export const App: React.FC = () => {
@@ -29,20 +28,15 @@ export const App: React.FC = () => {
             <GraphFPrime
               state={state}
               visibility={visibility}
+              onChangeVisibility={setVisibility}
               onChangeX={setX}
               heightClass="h-96"
             />
             <GraphGP state={state} onChangeX={setX} />
           </div>
 
-          {/* Controls & Math Panel Column (Right) */}
+          {/* Math Breakdown & Textbook Commentary Column (Right) */}
           <div className="lg:col-span-5 space-y-4">
-            <Controls
-              x={x}
-              onChangeX={setX}
-              visibility={visibility}
-              onChangeVisibility={setVisibility}
-            />
             <MathFormula state={state} />
           </div>
         </div>
