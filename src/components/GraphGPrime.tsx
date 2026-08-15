@@ -12,7 +12,7 @@ interface GraphGPrimeProps {
 export const GraphGPrime: React.FC<GraphGPrimeProps> = ({
   state,
   onChangeP,
-  heightClass = 'h-72',
+  heightClass = 'h-[380px]',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 

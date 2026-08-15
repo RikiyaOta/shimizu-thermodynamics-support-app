@@ -42,11 +42,11 @@ export const LegendrePage: React.FC = () => {
             <GraphFPrime
               state={state}
               onChangeX={handleXChange}
-              heightClass="h-80"
+              heightClass="h-[380px]"
             />
 
             {/* 2. g'(p) = x vs p (Axis Swapped Dual Graph) */}
-            <GraphGPrime state={state} onChangeP={handlePChange} />
+            <GraphGPrime state={state} onChangeP={handlePChange} heightClass="h-[380px]" />
 
             {/* 3. g(p) vs p */}
             <GraphGP state={state} onChangeP={handlePChange} />
