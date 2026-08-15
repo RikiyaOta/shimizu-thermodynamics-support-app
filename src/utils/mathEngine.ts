@@ -7,9 +7,31 @@ import { LegendrePointState } from '../types/legendre';
  * 区間2 (1 <= x < 2): f(x) = x - 0.5, f'(x) = 1 (平坦領域: p=1 一定, g(1) = 0.5)
  * 区間3 (2 <= x < 3): f(x) = x^2/2 - x + 1.5, f'(x) = x - 1
  * 区間4 (3 <= x): f(x) = x^2/2 - 1.5, f'(x) = x (x=3 で f'(x) が 2 から 3 へ飛び移る)
+ * 
+ * @param x 独立変数 x
+ * @param explicitP 2.0 <= p <= 3.0 のジャンプ補間領域で p を直接操作する際の明示的 p
  */
-export function evalLegendre(x: number): LegendrePointState {
+export function evalLegendre(x: number, explicitP?: number): LegendrePointState {
   const clampX = Math.max(0.01, Math.min(x, 4.5));
+
+  // If explicitP in [2.0, 3.0] is specified, or x is near 3.0 with explicitP
+  if (explicitP !== undefined && explicitP >= 2.0 && explicitP <= 3.0) {
+    const p = Math.max(2.0, Math.min(explicitP, 3.0));
+    const fx = 3.0; // Integral under f'(x) up to x=3 is 3.0
+    const gp = 3.0 * p - fx; // 3p - 3
+    return {
+      x: 3.0,
+      fx,
+      p,
+      gp,
+      domainIndex: 4,
+      domainName: '区間3.5 (2 <= p <= 3): 不連続ジャンプ補間領域 (x=3.0固定)',
+      isFlatRegion: false,
+      isDiscontinuityPoint: true,
+      descriptionJa: 'x=3.0 に固定されたまま p だけが 2.0 から 3.0 へ滑らかに動いており、長方形の高さが伸びて g(p) = 3p - 3 の直線補間上を移動しています。',
+    };
+  }
+
   let fx = 0;
   let p = 0;
   let domainIndex: 1 | 2 | 3 | 4 = 1;
@@ -95,8 +117,6 @@ export function evalGP(p: number): { g: number; x: number | null; isInterpolated
 
 /**
  * p を操作した時に対応する x の値を導き出す逆写像関数
- * @param p 変換後の独立変数 p = f'(x)
- * @param currentX 現在の x の値 (p=1.0 の平坦領域での状態保持用)
  */
 export function pToX(p: number, currentX: number = 1.5): number {
   const clampP = Math.max(0.25, Math.min(p, 4.2));
@@ -106,7 +126,6 @@ export function pToX(p: number, currentX: number = 1.5): number {
     return Math.sqrt((4 * clampP - 1) / 3);
   } else if (Math.abs(clampP - 1.0) < 0.01) {
     // Domain 2 (Flat region p = 1.0): x in [1, 2)
-    // If currentX is already within [1.0, 2.0), preserve it; otherwise return 1.5
     if (currentX >= 1.0 && currentX < 2.0) {
       return currentX;
     }

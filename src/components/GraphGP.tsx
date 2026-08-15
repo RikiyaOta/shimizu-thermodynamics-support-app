@@ -1,14 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import { LegendrePointState } from '../types/legendre';
-import { evalGP, pToX } from '../utils/mathEngine';
+import { evalGP } from '../utils/mathEngine';
 import { Sliders } from 'lucide-react';
 
 interface GraphGPProps {
   state: LegendrePointState;
-  onChangeX: (x: number) => void;
+  onChangeP: (p: number) => void;
 }
 
-export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeX }) => {
+export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -125,6 +125,11 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeX }) => {
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(`平坦部 (1<=x<2) → p=1 で g(1)=0.5 に集約`, curCx + 10, curCy - 5);
+    } else if (state.p >= 2.0 && state.p <= 3.0 && Math.abs(state.x - 3.0) < 0.05) {
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`x=3.0 固定 (2<=p<=3) 直線補間`, curCx + 10, curCy - 5);
     }
 
     // Axis Labels
@@ -146,13 +151,9 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeX }) => {
     const pMax = 4.2;
 
     const targetP = pMin + ((clickP - margin.left) / (width - margin.left - margin.right)) * (pMax - pMin);
-    const targetX = pToX(targetP, state.x);
-    onChangeX(targetX);
-  };
-
-  const handlePChange = (targetP: number) => {
-    const targetX = pToX(targetP, state.x);
-    onChangeX(targetX);
+    if (targetP >= 0.25 && targetP <= 4.2) {
+      onChangeP(targetP);
+    }
   };
 
   return (
@@ -187,7 +188,7 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeX }) => {
               value={state.p.toFixed(2)}
               onChange={(e) => {
                 const val = parseFloat(e.target.value);
-                if (!isNaN(val)) handlePChange(val);
+                if (!isNaN(val)) onChangeP(val);
               }}
               className="w-20 bg-slate-800 border border-slate-700 text-amber-300 font-mono font-bold text-xs px-2 py-0.5 rounded text-right focus:outline-none focus:border-amber-500"
             />
@@ -199,13 +200,13 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeX }) => {
           max="4.2"
           step="0.01"
           value={state.p}
-          onChange={(e) => handlePChange(parseFloat(e.target.value))}
+          onChange={(e) => onChangeP(parseFloat(e.target.value))}
           className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
         />
         <div className="flex justify-between text-[10px] text-slate-400 font-mono px-1">
           <span>0.25</span>
           <span>p=1.0 (平坦部: g=0.5)</span>
-          <span>p=2.0 → 3.0 (直線補間)</span>
+          <span className="text-amber-300 font-bold">2.0 ≤ p ≤ 3.0 (x=3.0固定 直線補間)</span>
           <span>4.2</span>
         </div>
       </div>

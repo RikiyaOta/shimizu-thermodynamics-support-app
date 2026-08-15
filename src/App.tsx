@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { LayerVisibility } from './types/legendre';
-import { evalLegendre } from './utils/mathEngine';
+import { evalLegendre, pToX } from './utils/mathEngine';
 import { Header } from './components/Header';
 import { GraphFPrime } from './components/GraphFPrime';
 import { GraphGP } from './components/GraphGP';
@@ -9,13 +9,31 @@ import { MathFormula } from './components/MathFormula';
 export const App: React.FC = () => {
   // Default x=1.5 (flat region where p=1 constant, showcase key Shimizu textbook insight)
   const [x, setX] = useState<number>(1.5);
+  const [overrideP, setOverrideP] = useState<number | undefined>(undefined);
+
   const [visibility, setVisibility] = useState<LayerVisibility>({
     showRectangle: true,
     showFxArea: true,
     showGpArea: true,
   });
 
-  const state = useMemo(() => evalLegendre(x), [x]);
+  const state = useMemo(() => evalLegendre(x, overrideP), [x, overrideP]);
+
+  const handleXChange = (newX: number) => {
+    setX(newX);
+    setOverrideP(undefined);
+  };
+
+  const handlePChange = (targetP: number) => {
+    const clampP = Math.max(0.25, Math.min(targetP, 4.2));
+    if (clampP >= 2.0 && clampP <= 3.0) {
+      setX(3.0);
+      setOverrideP(clampP);
+    } else {
+      setX(pToX(clampP, x));
+      setOverrideP(undefined);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-sky-500 selection:text-white">
@@ -29,10 +47,10 @@ export const App: React.FC = () => {
               state={state}
               visibility={visibility}
               onChangeVisibility={setVisibility}
-              onChangeX={setX}
+              onChangeX={handleXChange}
               heightClass="h-96"
             />
-            <GraphGP state={state} onChangeX={setX} />
+            <GraphGP state={state} onChangeP={handlePChange} />
           </div>
 
           {/* Math Breakdown & Textbook Commentary Column (Right) */}
