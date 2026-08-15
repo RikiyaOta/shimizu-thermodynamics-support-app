@@ -150,7 +150,7 @@ export const GraphGP: React.FC<GraphGPProps> = ({ state, onChangeP }) => {
     <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 shadow-lg flex flex-col items-center space-y-3">
       {/* Header Info */}
       <div className="flex justify-between w-full mb-1 items-center px-1">
-        <span className="text-sm font-bold text-amber-400">変換後関数 g(p) = xp - f(x)</span>
+        <span className="text-sm font-bold text-amber-400">変換後関数 g(p) = [xp - f(x)](p)</span>
         <span className="text-xs text-slate-400">g({state.p.toFixed(2)}) = {state.gp.toFixed(3)}</span>
       </div>
 
