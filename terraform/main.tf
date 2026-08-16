@@ -37,25 +37,9 @@ resource "cloudflare_pages_project" "support_app" {
   }
 }
 
-# Look up Cloudflare Zone for DNS management
-data "cloudflare_zone" "zone" {
-  account_id = var.cloudflare_account_id
-  name       = var.domain_zone
-}
-
-# Custom domain mapping for Cloudflare Pages project
+# Custom domain mapping for Cloudflare Pages project (External DNS managed via Onamae.com)
 resource "cloudflare_pages_domain" "custom_domain" {
   account_id   = var.cloudflare_account_id
   project_name = cloudflare_pages_project.support_app.name
   domain       = var.custom_domain
-}
-
-# CNAME DNS record routing to the Pages project
-resource "cloudflare_record" "custom_domain_cname" {
-  zone_id = data.cloudflare_zone.zone.id
-  name    = var.custom_domain
-  value   = "${cloudflare_pages_project.support_app.name}.pages.dev"
-  type    = "CNAME"
-  proxied = true
-  ttl     = 1
 }
