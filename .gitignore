@@ -10,10 +10,21 @@ dist/
 dist-ssr/
 *.local
 
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
 # Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
+terraform.tfvars
+*.auto.tfvars
+terraform.tfvars.json
 crash.log
 crash.*.log
 
