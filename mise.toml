@@ -2,6 +2,6 @@
 lockfile = true
 
 [tools]
-node = "22.14.0"
+node = "24.19.0"
 pnpm = "11.20.0"
 terraform = "1.10.5"
