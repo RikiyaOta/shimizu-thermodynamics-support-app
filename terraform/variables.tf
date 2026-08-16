@@ -14,3 +14,9 @@ variable "project_name" {
   type        = string
   default     = "shimizu-thermodynamics-support-app"
 }
+
+variable "custom_domain" {
+  description = "Custom domain for Cloudflare Pages (managed via Onamae.com DNS)"
+  type        = string
+  default     = "shimizu-thermodynamics-unofficial-support-site.rikiyaota.kyoto"
+}

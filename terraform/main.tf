@@ -36,3 +36,10 @@ resource "cloudflare_pages_project" "support_app" {
     root_dir        = ""
   }
 }
+
+# Custom domain mapping for Cloudflare Pages project (External DNS managed via Onamae.com)
+resource "cloudflare_pages_domain" "custom_domain" {
+  account_id   = var.cloudflare_account_id
+  project_name = cloudflare_pages_project.support_app.name
+  domain       = var.custom_domain
+}

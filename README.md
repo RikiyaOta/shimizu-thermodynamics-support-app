@@ -2,6 +2,8 @@
 
 清水明 著『熱力学の基礎（第2版）』（東京大学出版会）の学習を補助・深化させるための、Webブラウザ上で完結するインタラクティブな非公式学習サポート Web アプリケーションポータルです。
 
+- **公開 URL**: https://shimizu-thermodynamics-unofficial-support-site.rikiyaota.kyoto
+
 ---
 
 ## 概要と特徴
