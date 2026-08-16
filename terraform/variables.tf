@@ -14,3 +14,15 @@ variable "project_name" {
   type        = string
   default     = "shimizu-thermodynamics-support-app"
 }
+
+variable "custom_domain" {
+  description = "Custom domain for Cloudflare Pages"
+  type        = string
+  default     = "shimizu-thermodynamics-unofficial-support-site.rikiyaota.kyoto"
+}
+
+variable "domain_zone" {
+  description = "Root domain zone for DNS management"
+  type        = string
+  default     = "rikiyaota.kyoto"
+}
