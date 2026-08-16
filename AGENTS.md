@@ -16,7 +16,7 @@
 
 - **パッケージマネージャー**: 必ず **`pnpm`** を使用すること（`npm` や `yarn` の直接実行は不可）。
 - **ツールバージョン管理 (`mise`)**:
-  - `mise.toml` および `mise.lock` によって Node.js (`22.14.0`), pnpm (`11.20.0`), Terraform (`1.10.5`) のバージョンが管理されています。
+  - `mise.toml` および `mise.lock` によって Node.js (`24.19.0`), pnpm (`11.20.0`), Terraform (`1.10.5`) のバージョンが管理されています。
   - ローカル実行時は `mise exec -- pnpm test` や `mise exec -- pnpm build` を使用してください。
 - **セキュリティポリシー**:
   - `.npmrc`: `minimum-release-age=7d`（リリース1週間未満のパッケージ使用禁止）および `ignore-scripts=true`（スクリプト無断実行の禁止）。
